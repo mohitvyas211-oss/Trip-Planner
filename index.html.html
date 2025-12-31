@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Couple Trip Planner</title>
+  <style>
+    :root{
+      --red:#dc2626;
+      --red2:#b91c1c;
+      --soft:#fff5f5;
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --card:#ffffff;
+      --border:#fee2e2;
+      --shadow: 0 10px 30px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:var(--bg);
+    }
+    a{color:inherit}
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background:rgba(255,255,255,.9);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:0 16px}
+    .topbar-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0;
+      gap:12px;
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:42px; height:42px; border-radius:16px;
+      background:var(--red);
+      display:grid; place-items:center;
+      box-shadow: var(--shadow);
+    }
+    .logo svg{fill:#fff}
+    .brand h1{font-size:16px; margin:0; line-height:1.2}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+    .chip{
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--red2);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .chip.good{background:#16a34a; border-color:#16a34a; color:#fff}
+    .chip.bad{background:var(--red); border-color:var(--red); color:#fff}
+    .btn{
+      border:1px solid var(--border);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn.primary{
+      border-color:var(--red);
+      background:var(--red);
+      color:#fff;
+    }
+    .btn.primary:hover{background:var(--red2); border-color:var(--red2)}
+    .btn:hover{filter:brightness(.99)}
+    .hero{
+      background:var(--soft);
+      border-bottom:1px solid var(--border);
+      padding:26px 0 18px;
+    }
+    .grid{
+      display:grid;
+      gap:16px;
+    }
+    @media (min-width: 920px){
+      .grid.hero-grid{grid-template-columns: 1.25fr .9fr; align-items:start}
+      .grid.main-grid{grid-template-columns: 1.25fr .9fr; align-items:start}
+    }
+    .title{
+      font-size:30px; margin:0;
+      letter-spacing:-.02em;
+    }
+    .subtitle{color:var(--muted); margin:10px 0 0; line-height:1.6}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:16px 16px 10px;
+    }
+    .card .hd h3{margin:0; font-size:14px}
+    .card .hd p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.4}
+    .card .bd{padding:0 16px 16px}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .field{display:grid; gap:6px; width:100%}
+    label{font-size:12px; color:var(--muted)}
+    select,input,textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      outline:none;
+      font-size:14px;
+      background:#fff;
+    }
+    textarea{min-height:72px; resize:vertical}
+    .kpi{
+      display:flex; justify-content:space-between; gap:12px; align-items:center;
+      font-size:14px; padding:10px 12px;
+      border-radius:16px; border:1px solid var(--border);
+      background: #fff;
+    }
+    .kpi strong{font-weight:800}
+    .muted{color:var(--muted)}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      color:var(--red2);
+      background:#fff;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      margin-top:12px;
+    }
+
+    /* Calendar */
+    .cal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+    .cal-head .month{font-weight:800}
+    .cal{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:8px;
+      user-select:none;
+    }
+    .dow{
+      font-size:11px; color:var(--muted);
+      text-align:center;
+      padding:4px 0;
+    }
+    .day{
+      height:44px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--border);
+      border-radius:14px;
+      cursor:pointer;
+      background:#fff;
+      font-weight:700;
+    }
+    .day.empty{border:0; background:transparent; cursor:default}
+    .day.busy{
+      background:var(--red);
+      border-color:var(--red);
+      color:#fff;
+    }
+    .day:hover:not(.empty){filter:brightness(.99)}
+    .legend{
+      margin-top:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-size:12px; color:var(--muted);
+    }
+    .swatch{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:8px; vertical-align:middle}
+    .swatch.red{background:var(--red)}
+    .swatch.white{background:#fff; border:1px solid #cbd5e1}
+
+    /* Tabs */
+    .tabs{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding:0 16px 12px;
+    }
+    .tab{
+      padding:9px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      font-weight:700;
+      font-size:12px;
+      color:var(--red2);
+    }
+    .tab.active{
+      background:var(--red);
+      border-color:var(--red);
+      color:#fff;
+    }
+    .tabpanes{padding:0 16px 16px}
+    .pane{display:none}
+    .pane.active{display:block}
+    .list{
+      display:grid; gap:10px;
+      margin:0; padding:0;
+      list-style:none;
+    }
+    .item{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      background:#fff;
+    }
+    .item small{display:block; color:var(--muted); margin-top:3px}
+    .check{
+      width:18px; height:18px; margin-top:2px;
+      accent-color: var(--red);
+      cursor:pointer;
+    }
+    .progress{
+      margin-top:12px;
+      height:10px;
+      background:#f1f5f9;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--red);
+    }
+    .split{
+      display:grid;
+      gap:12px;
+    }
+    @media(min-width:640px){
+      .split{grid-template-columns:1fr 1fr}
+    }
+    .softbox{
+      border:1px solid var(--border);
+      background:var(--soft);
+      border-radius:18px;
+      padding:12px;
+    }
+    .softbox h4{margin:0; font-size:13px}
+    .softbox p{margin:6px 0 0; font-size:13px; color:var(--muted); line-height:1.5}
+    .cta{
+      margin-top:18px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .footer{
+      border-top:1px solid var(--border);
+      padding:18px 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .link{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .icon{width:16px; height:16px}
+    .toast{
+      position:fixed;
+      bottom:16px; left:50%;
+      transform:translateX(-50%);
+      background:#0f172a;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      box-shadow: var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease;
+      font-size:13px;
+      z-index:50;
+    }
+    .toast.show{opacity:1}
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path d="M12 21s-6.716-4.35-9.428-8.202C.94 10.37 1.21 7.5 3.2 5.5 5.1 3.6 8.1 3.7 10 5.6l2 2 2-2c1.9-1.9 4.9-2 6.8-.1 2 2 2.26 4.87.63 7.298C18.716 16.65 12 21 12 21z"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Couple Trip Planner</h1>
+            <p>Red and white planner for you and your wife</p>
+          </div>
+        </div>
+
+        <div class="chips">
+          <span id="chipDays" class="chip">0 days</span>
+          <span id="chipBudget" class="chip">Budget check</span>
+          <button class="btn primary" id="openSettings">Couple settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap grid hero-grid">
+      <div>
+        <h2 class="title">Plan one perfect trip for <span style="color:var(--red2)" id="nameYou">Mohit</span> and <span style="color:var(--red2)" id="namePartner">Ayushi</span></h2>
+        <p class="subtitle">Select a trip, mark busy dates on the calendar, track your bucket list, and keep travel, stay, and price info in one place.</p>
+
+        <div class="grid" style="margin-top:14px">
+          <div class="split">
+            <div class="card">
+              <div class="hd">
+                <h3>Select your trip</h3>
+                <p>Pick one from your shortlist of 6.</p>
+              </div>
+              <div class="bd">
+                <div class="field">
+                  <label for="tripSelect">Trip</label>
+                  <select id="tripSelect"></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="hd">
+                <h3>Quick cost check</h3>
+                <p>Estimate for two people.</p>
+              </div>
+              <div class="bd">
+                <div class="kpi"><span class="muted">Per person</span><strong id="perPerson">₹0</strong></div>
+                <div class="kpi" style="margin-top:10px"><span class="muted">Total (2 pax)</span><strong id="totalPrice">₹0</strong></div>
+                <div class="cta">
+                  <a class="btn primary link" id="agentLink" target="_blank" rel="noreferrer">
+                    View packages
+                    <svg class="icon" viewBox="0 0 24 24" fill="none">
+                      <path d="M14 3h7v7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M10 14L21 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </a>
+                  <button class="btn" id="copySummary">Copy plan summary</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="badge" id="bestTimeBadge">Best time: </span>
+            <span class="badge" id="countryBadge">Country: </span>
+            <span class="badge" id="bucketBadge">Bucket progress: 0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <h3>Your free time calendar</h3>
+          <p>Click a date to toggle it as <strong>Busy</strong>. Everything else is Free.</p>
+        </div>
+        <div class="bd">
+          <div class="cal-head">
+            <button class="btn" id="prevMonth">◀</button>
+            <div class="month" id="monthLabel">Month</div>
+            <button class="btn" id="nextMonth">▶</button>
+          </div>
+
+          <div class="cal" id="calGrid"></div>
+
+          <div class="legend">
+            <div><span class="swatch red"></span>Busy days</div>
+            <div><span class="swatch white"></span>Free days</div>
+            <div><strong id="busyCount">0</strong> busy</div>
+          </div>
+
+          <div class="cta">
+            <button class="btn" id="exportBusy">Export busy dates</button>
+            <button class="btn" id="clearBusy">Clear busy dates</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap" style="padding:22px 16px 0">
+    <div class="grid main-grid">
+      <div class="card">
+        <div class="hd">
+          <h3>About the place</h3>
+          <p id="tripName">Trip name</p>
+        </div>
+        <div class="bd">
+          <p id="tripBrief" class="subtitle" style="margin-top:0"></p>
+
+          <div class="split" style="margin-top:14px">
+            <div class="softbox">
+              <h4>Best time to visit</h4>
+              <p id="bestTimeText"></p>
+            </div>
+            <div class="softbox">
+              <h4>Price estimate</h4>
+              <p><span id="priceText"></span> per person, <strong id="priceTwoText"></strong> for two</p>
+            </div>
+          </div>
+
+          <div class="tabs" style="margin-top:14px">
+            <button class="tab active" data-tab="bucket">Bucket list</button>
+            <button class="tab" data-tab="dos">Do</button>
+            <button class="tab" data-tab="donts">Don’t</button>
+            <button class="tab" data-tab="extras">Couple extras</button>
+          </div>
+
+          <div class="tabpanes">
+            <div class="pane active" id="pane-bucket">
+              <ul class="list" id="bucketList"></ul>
+
+              <div style="margin-top:12px; display:flex; justify-content:space-between; gap:10px; font-size:13px">
+                <span class="muted">Progress</span>
+                <strong id="bucketProgressText">0/0</strong>
+              </div>
+              <div class="progress"><div class="bar" id="bucketBar"></div></div>
+            </div>
+
+            <div class="pane" id="pane-dos">
+              <ul class="list" id="dosList"></ul>
+            </div>
+
+            <div class="pane" id="pane-donts">
+              <ul class="list" id="dontsList"></ul>
+            </div>
+
+            <div class="pane" id="pane-extras">
+              <div class="split" id="extrasGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid; gap:16px">
+        <div class="card">
+          <div class="hd">
+            <h3>Travel details</h3>
+            <p>How to get there and move around.</p>
+          </div>
+          <div class="bd">
+            <div class="item">
+              <div style="font-weight:900;color:var(--red2)">✈</div>
+              <div>
+                <div style="font-weight:800">Getting there</div>
+                <small id="gettingThere"></small>
+              </div>
+            </div>
+            <div class="item" style="margin-top:10px">
+              <div style="font-weight:900;color:var(--red2)">🚌</div>
+              <div>
+                <div style="font-weight:800">Local transport</div>
+                <small id="localTransport"></small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Accommodation</h3>
+            <p>Stay style and what to prioritize.</p>
+          </div>
+          <div class="bd">
+            <div class="item">
+              <div style="font-weight:900;color:var(--red2)">🏨</div>
+              <div>
+                <div style="font-weight:800">Recommended style</div>
+                <small id="stayStyle"></small>
+              </div>
+            </div>
+            <div class="item" style="margin-top:10px">
+              <div style="font-weight:900;color:var(--red2)">📝</div>
+              <div>
+                <div style="font-weight:800">Notes</div>
+                <small id="stayNotes"></small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Travel agent</h3>
+            <p>Package link and quick notes.</p>
+          </div>
+          <div class="bd">
+            <div class="item">
+              <div style="font-weight:900;color:var(--red2)">⭐</div>
+              <div style="flex:1">
+                <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start">
+                  <div>
+                    <div style="font-weight:800" id="agentName"></div>
+                    <small id="agentNotes"></small>
+                  </div>
+                  <a class="btn link" id="agentLink2" target="_blank" rel="noreferrer">Open ↗</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="softbox" style="margin-top:10px">
+              <h4>Smart add-ons</h4>
+              <p class="muted" style="margin:8px 0 0">
+                Travel insurance, airport transfers, breakfast included, flexible cancellation, local SIM or eSIM
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Price breakdown</h3>
+            <p>Simple and editable.</p>
+          </div>
+          <div class="bd">
+            <div class="kpi"><span class="muted">Package (per person)</span><strong id="ppBreak">₹0</strong></div>
+            <div class="kpi" style="margin-top:10px"><span class="muted">People</span><strong>2</strong></div>
+            <div class="kpi" style="margin-top:10px"><span class="muted">Estimated total</span><strong id="totBreak">₹0</strong></div>
+            <p class="muted" style="margin:10px 2px 0; font-size:12px">
+              Budget set to <strong id="budgetText">₹0</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin:18px 0 0">
+      <div class="bd" style="padding-top:16px">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
+          <div>
+            <div style="font-weight:900; font-size:16px">Next steps</div>
+            <div class="muted" style="margin-top:6px; font-size:13px; line-height:1.5">
+              Mark busy days, pick a best month from “Best time”, then shortlist 2 package options to compare.
+            </div>
+          </div>
+          <div class="cta" style="margin:0">
+            <button class="btn primary" id="copySummary2">Copy plan summary</button>
+            <a class="btn link" id="comparePackages" target="_blank" rel="noreferrer">Compare packages ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="wrap" style="padding:0">
+        Built for <span id="footerYou">Mohit</span> and <span id="footerPartner">Ayushi</span>. Data is saved locally in this browser.
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <dialog id="settingsModal" style="border:0; border-radius:22px; padding:0; width:min(720px, 96vw); box-shadow: var(--shadow);">
+    <div class="card" style="border-radius:22px; box-shadow:none">
+      <div class="hd" style="padding:18px 18px 10px">
+        <h3>Couple settings</h3>
+        <p>Names, combined budget, and notes. Stored only in your browser.</p>
+      </div>
+      <div class="bd" style="padding:0 18px 18px">
+        <div class="split">
+          <div class="field">
+            <label for="youInput">Your name</label>
+            <input id="youInput" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label for="partnerInput">Partner name</label>
+            <input id="partnerInput" placeholder="Partner name" />
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:12px">
+          <label for="budgetInput">Combined budget (INR)</label>
+          <input id="budgetInput" type="number" min="0" step="1000" />
+        </div>
+
+        <div class="field" style="margin-top:12px">
+          <label for="notesInput">Notes (visa, leaves, preferences)</label>
+          <textarea id="notesInput" placeholder="Example: prefer 4-star stays, vegetarian options, leave constraints"></textarea>
+        </div>
+
+        <div class="cta" style="justify-content:flex-end">
+          <button class="btn" id="resetAll">Reset planner</button>
+          <button class="btn primary" id="saveSettings">Save</button>
+          <button class="btn" id="closeSettings">Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Export Busy Modal -->
+  <dialog id="exportModal" style="border:0; border-radius:22px; padding:0; width:min(640px, 96vw); box-shadow: var(--shadow);">
+    <div class="card" style="border-radius:22px; box-shadow:none">
+      <div class="hd" style="padding:18px 18px 10px">
+        <h3>Busy dates (copy & paste)</h3>
+        <p>Format: YYYY-MM-DD</p>
+      </div>
+      <div class="bd" style="padding:0 18px 18px">
+        <textarea id="busyExportText" readonly style="min-height:180px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></textarea>
+        <div class="cta" style="justify-content:flex-end">
+          <button class="btn" id="copyBusy">Copy</button>
+          <button class="btn" id="closeExport">Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast">Copied</div>
+
+  <script>
+    const TRIPS = [
+      {
+        id: "japan",
+        name: "Japan (Tokyo, Kyoto, Osaka)",
+        country: "Japan",
+        brief: "Neon cities, calm neighborhoods, incredible food, and fast trains that make multi-city trips effortless.",
+        bestTime: "Late Mar to mid Apr (sakura) or Oct to Nov (autumn colors)",
+        durationDays: 9,
+        pricePerPersonINR: 185000,
+        agent: {
+          name: "MakeMyTrip – Japan Packages",
+          link: "https://www.makemytrip.com/holidays-international/japan-vacation-tour-packages.html",
+          notes: "Good for curated multi-city routes and common add-ons like visa guidance."
+        },
+        bucketList: [
+          "Tokyo: Shibuya crossing + night food hunt",
+          "Kyoto: Arashiyama bamboo + Gion evening walk",
+          "Osaka: Dotonbori street food crawl",
+          "Day trip: Nara deer park",
+          "Shinkansen ride between cities"
+        ],
+        dos: [
+          "Carry some cash for smaller shops",
+          "Use an IC card for local transit",
+          "Reserve popular experiences early"
+        ],
+        donts: [
+          "Do not speak loudly on trains",
+          "Do not tip (generally not customary)",
+          "Avoid eating while walking in crowded areas"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Tokyo or Osaka via a hub (Delhi, Dubai, Singapore).",
+          localTransport: "Metro with IC card. Compare JR Pass vs point-to-point tickets."
+        },
+        stay: {
+          style: "Tokyo business hotel, one ryokan-style night in Kyoto, central hotel in Osaka",
+          notes: "Choose stays near key stations for easy movement and late-night access."
+        },
+        coupleExtras: ["Onsen day", "Kimono rental photos", "Sushi omakase"]
+      },
+      {
+        id: "turkey",
+        name: "Turkey (Istanbul, Cappadocia)",
+        country: "Turkey",
+        brief: "History, bazaars, rooftop cafés, and surreal landscapes with sunrise balloon views.",
+        bestTime: "Apr to Jun or Sep to Oct",
+        durationDays: 7,
+        pricePerPersonINR: 140000,
+        agent: {
+          name: "Thomas Cook – Turkey Packages",
+          link: "https://www.thomascook.in/holidays/international-tour-packages/turkey-tour-packages",
+          notes: "Often includes guided highlights. Confirm balloon inclusions and weather policy."
+        },
+        bucketList: [
+          "Istanbul: Old city walk + Spice Bazaar",
+          "Bosphorus sunset cruise",
+          "Cappadocia: Hot-air balloon sunrise",
+          "Cave hotel stay",
+          "Göreme viewpoints + pottery workshop"
+        ],
+        dos: [
+          "Book balloon rides early (weather dependent)",
+          "Carry a light jacket for evenings",
+          "Use licensed tours and official taxis"
+        ],
+        donts: [
+          "Do not buy without comparing in bazaars",
+          "Avoid unlicensed operators for tours",
+          "Do not keep passport loosely; use the hotel safe"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Istanbul via a hub, then domestic to Kayseri or Nevşehir.",
+          localTransport: "Transit card in Istanbul. Pre-booked day tours in Cappadocia."
+        },
+        stay: {
+          style: "Istanbul boutique hotel plus Cappadocia cave hotel",
+          notes: "Choose Sultanahmet for sights or Karaköy for a modern vibe."
+        },
+        coupleExtras: ["Rooftop dinner", "Traditional hammam", "Sunrise ATV tour"]
+      },
+      {
+        id: "uzbekistan",
+        name: "Uzbekistan (Tashkent, Samarkand, Bukhara)",
+        country: "Uzbekistan",
+        brief: "Silk Road cities with jaw-dropping architecture, great value, and easy train connectivity.",
+        bestTime: "Apr to Jun or Sep to early Nov",
+        durationDays: 8,
+        pricePerPersonINR: 120000,
+        agent: {
+          name: "Veena World – Uzbekistan Tour",
+          link: "https://www.veenaworld.com/package/best-of-uzbekistan-tour-package-shuz3/i",
+          notes: "Convenient group tours. Consider a private add-on for flexibility."
+        },
+        bucketList: [
+          "Samarkand: Registan Square at night",
+          "Bukhara: Old city sunrise walk",
+          "Silk Road craft shopping",
+          "High-speed train between cities",
+          "Plov tasting in each city"
+        ],
+        dos: [
+          "Plan midday breaks in warmer months",
+          "Use official exchange channels",
+          "Prefer trains for city-to-city travel"
+        ],
+        donts: [
+          "Do not underestimate the sun",
+          "Avoid unofficial money exchange",
+          "Do not overpack for cobbled streets"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Tashkent, often via a hub.",
+          localTransport: "Trains for long hops, taxis for short rides."
+        },
+        stay: {
+          style: "Historic-style hotels near the old town",
+          notes: "Staying central makes evenings safer and more walkable."
+        },
+        coupleExtras: ["Courtyard dinner", "Silk paper workshop", "Night photography walk"]
+      },
+      {
+        id: "georgia",
+        name: "Georgia (Tbilisi, Kazbegi, Kakheti)",
+        country: "Georgia",
+        brief: "Mountain views, warm culture, and wine-country day trips with a lively capital base.",
+        bestTime: "May to Jun or Sep",
+        durationDays: 6,
+        pricePerPersonINR: 110000,
+        agent: {
+          name: "MakeMyTrip – Georgia Packages",
+          link: "https://www.makemytrip.com/holidays-international/georgia-packages-from-hyderabad.html",
+          notes: "Check for Kazbegi and wine region day tours in inclusions."
+        },
+        bucketList: [
+          "Tbilisi: Old town + sulfur baths",
+          "Kazbegi: scenic drive + short hike",
+          "Kakheti: wine tastings + vineyard lunch",
+          "Cable car city views",
+          "Bakery crawl (khachapuri)"
+        ],
+        dos: [
+          "Pack layers for mountains",
+          "Use guided day trips for ease",
+          "Wear comfortable shoes for cobblestones"
+        ],
+        donts: [
+          "Do not rush Kazbegi; leave early",
+          "Avoid isolated streets late night",
+          "Do not skip insurance for mountain days"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Tbilisi via a hub.",
+          localTransport: "Metro and taxis in Tbilisi. Day tours for Kazbegi and Kakheti."
+        },
+        stay: {
+          style: "Old town boutique hotel",
+          notes: "Stay central to keep evenings simple and safe."
+        },
+        coupleExtras: ["Wine cellar dinner", "City viewpoint picnic", "Spa evening"]
+      },
+      {
+        id: "srilanka",
+        name: "Sri Lanka (Hill Country, South Coast)",
+        country: "Sri Lanka",
+        brief: "Beach sunsets plus misty tea-country train rides with a gentle pace and great food.",
+        bestTime: "Nov to Apr (south and west coasts)",
+        durationDays: 7,
+        pricePerPersonINR: 95000,
+        agent: {
+          name: "MakeMyTrip – Sri Lanka Packages",
+          link: "https://www.makemytrip.com/holidays-international/sri_lanka-vacation-tour-packages.html",
+          notes: "Choose routes with one scenic train segment for the experience."
+        },
+        bucketList: [
+          "Ella: viewpoints + café hopping",
+          "Tea estate and factory tour",
+          "Scenic train ride through tea country",
+          "Galle Fort evening walk",
+          "Beach day with sunset dinner"
+        ],
+        dos: [
+          "Book the train segment early",
+          "Carry a light rain layer",
+          "Keep cash for smaller eateries"
+        ],
+        donts: [
+          "Do not overpack the itinerary",
+          "Avoid unlicensed wildlife experiences",
+          "Do not leave valuables unattended at beaches"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Colombo, often via a short hop connection.",
+          localTransport: "Private driver for comfort. Train for the scenic segment."
+        },
+        stay: {
+          style: "Two nights hill country, three nights south coast",
+          notes: "Choose well-reviewed stays for cleanliness and safety."
+        },
+        coupleExtras: ["Couple spa", "Beach picnic", "Cooking class"]
+      },
+      {
+        id: "ladakh",
+        name: "Ladakh (Leh, Nubra, Pangong)",
+        country: "India",
+        brief: "A dramatic high-altitude road trip with lakes, deserts, and crystal-clear night skies.",
+        bestTime: "Late May to Sep",
+        durationDays: 7,
+        pricePerPersonINR: 65000,
+        agent: {
+          name: "MakeMyTrip – Ladakh Packages",
+          link: "https://www.makemytrip.com/holidays-india/ladakh-travel-packages.html",
+          notes: "Prioritize acclimatization days and reliable transport. Permits are key."
+        },
+        bucketList: [
+          "Leh: market + cafés",
+          "Nubra: dunes + sunset viewpoint",
+          "Pangong: lake sunrise",
+          "Stargazing night",
+          "Scenic drives + short hikes"
+        ],
+        dos: [
+          "Acclimatize 1 to 2 days in Leh",
+          "Hydrate and go slow",
+          "Follow medical advice for altitude meds"
+        ],
+        donts: [
+          "Do not overexert on day one",
+          "Avoid alcohol early in the trip",
+          "Do not ignore headache or breathlessness"
+        ],
+        travel: {
+          gettingThere: "Flights: Hyderabad to Leh via Delhi.",
+          localTransport: "Pre-booked SUV with an experienced driver. Permits arranged by agent."
+        },
+        stay: {
+          style: "Leh hotel plus Nubra and Pangong homestays or camps",
+          notes: "Pick heated rooms when traveling early or late season."
+        },
+        coupleExtras: ["Bonfire night", "Local homestay dinner", "Photo stops at viewpoints"]
+      }
+    ];
+
+    // Storage
+    const STORAGE_KEY = "couple-trip-planner:html:v1";
+    const state = {
+      tripId: TRIPS[0].id,
+      you: "Mohit",
+      partner: "Ayushi",
+      budget: 300000,
+      notes: "",
+      busy: [], // array of YYYY-MM-DD
+      bucketDone: {} // { tripId: { idx: true } }
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function formatINR(n){
+      try{
+        return new Intl.NumberFormat("en-IN", {style:"currency", currency:"INR", maximumFractionDigits:0}).format(n);
+      }catch(e){ return "₹" + Math.round(n); }
+    }
+    function ymd(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,"0");
+      const d = String(date.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+    function load(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      try{
+        const parsed = JSON.parse(raw);
+        Object.assign(state, parsed);
+      }catch(e){}
+    }
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function toast(msg){
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"), 1200);
+    }
+
+    // Trip + UI
+    function getTrip(){
+      return TRIPS.find(t => t.id === state.tripId) || TRIPS[0];
+    }
+    function updateHeader(){
+      $("nameYou").textContent = state.you || "You";
+      $("namePartner").textContent = state.partner || "Partner";
+      $("footerYou").textContent = state.you || "You";
+      $("footerPartner").textContent = state.partner || "Partner";
+
+      const trip = getTrip();
+      $("chipDays").textContent = `${trip.durationDays} days`;
+      const total = trip.pricePerPersonINR * 2;
+      const ok = total <= (Number(state.budget) || 0);
+      const chip = $("chipBudget");
+      chip.className = "chip " + (ok ? "good" : "bad");
+      chip.textContent = ok ? "Within budget" : "Over budget";
+    }
+
+    function renderTripSelect(){
+      const sel = $("tripSelect");
+      sel.innerHTML = "";
+      TRIPS.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+      });
+      sel.value = state.tripId;
+      sel.addEventListener("change", (e) => {
+        state.tripId = e.target.value;
+        save();
+        renderAll();
+      });
+    }
+
+    function bucketDoneMap(){
+      if(!state.bucketDone[state.tripId]) state.bucketDone[state.tripId] = {};
+      return state.bucketDone[state.tripId];
+    }
+
+    function renderTripDetails(){
+      const trip = getTrip();
+      const total = trip.pricePerPersonINR * 2;
+
+      $("tripName").textContent = trip.name;
+      $("tripBrief").textContent = trip.brief;
+      $("bestTimeText").textContent = trip.bestTime;
+      $("bestTimeBadge").textContent = `Best time: ${trip.bestTime}`;
+      $("countryBadge").textContent = `Country: ${trip.country}`;
+
+      $("perPerson").textContent = formatINR(trip.pricePerPersonINR);
+      $("totalPrice").textContent = formatINR(total);
+      $("priceText").textContent = formatINR(trip.pricePerPersonINR);
+      $("priceTwoText").textContent = formatINR(total);
+
+      $("ppBreak").textContent = formatINR(trip.pricePerPersonINR);
+      $("totBreak").textContent = formatINR(total);
+      $("budgetText").textContent = formatINR(Number(state.budget) || 0);
+
+      $("agentName").textContent = trip.agent.name;
+      $("agentNotes").textContent = trip.agent.notes;
+
+      $("agentLink").href = trip.agent.link;
+      $("agentLink2").href = trip.agent.link;
+      $("comparePackages").href = trip.agent.link;
+
+      $("gettingThere").textContent = trip.travel.gettingThere;
+      $("localTransport").textContent = trip.travel.localTransport;
+
+      $("stayStyle").textContent = trip.stay.style;
+      $("stayNotes").textContent = trip.stay.notes;
+
+      // Lists
+      const done = bucketDoneMap();
+      $("bucketList").innerHTML = "";
+      trip.bucketList.forEach((txt, idx) => {
+        const li = document.createElement("li");
+        li.className = "item";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.className = "check";
+        cb.checked = !!done[idx];
+        cb.addEventListener("change", () => {
+          done[idx] = cb.checked;
+          state.bucketDone[state.tripId] = done;
+          save();
+          renderBucketProgress();
+        });
+        const div = document.createElement("div");
+        div.style.flex = "1";
+        div.innerHTML = `<div style="font-weight:800">${txt}</div><small>Tick as you finalize the plan</small>`;
+        li.appendChild(cb);
+        li.appendChild(div);
+        $("bucketList").appendChild(li);
+      });
+
+      $("dosList").innerHTML = "";
+      trip.dos.forEach(d => {
+        const li = document.createElement("li");
+        li.className = "item";
+        li.innerHTML = `<div style="font-weight:900;color:var(--red2)">•</div><div style="flex:1"><div style="font-weight:800">${d}</div></div>`;
+        $("dosList").appendChild(li);
+      });
+
+      $("dontsList").innerHTML = "";
+      trip.donts.forEach(d => {
+        const li = document.createElement("li");
+        li.className = "item";
+        li.innerHTML = `<div style="font-weight:900;color:var(--red2)">!</div><div style="flex:1"><div style="font-weight:800">${d}</div></div>`;
+        $("dontsList").appendChild(li);
+      });
+
+      $("extrasGrid").innerHTML = "";
+      trip.coupleExtras.forEach(x => {
+        const box = document.createElement("div");
+        box.className = "softbox";
+        box.innerHTML = `<h4>${x}</h4><p>Optional, but makes it special.</p>`;
+        $("extrasGrid").appendChild(box);
+      });
+
+      renderBucketProgress();
+      updateHeader();
+    }
+
+    function renderBucketProgress(){
+      const trip = getTrip();
+      const done = bucketDoneMap();
+      const total = trip.bucketList.length;
+      let completed = 0;
+      for(let i=0;i<total;i++) if(done[i]) completed++;
+      const pct = total ? Math.round((completed/total)*100) : 0;
+
+      $("bucketProgressText").textContent = `${completed}/${total}`;
+      $("bucketBar").style.width = pct + "%";
+      $("bucketBadge").textContent = `Bucket progress: ${pct}%`;
+    }
+
+    // Tabs
+    function initTabs(){
+      document.querySelectorAll(".tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const tab = btn.getAttribute("data-tab");
+          document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
+          $("pane-" + tab).classList.add("active");
+        });
+      });
+    }
+
+    // Calendar
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    let calYear, calMonth; // month: 0-11
+
+    function initCalendar(){
+      const now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      $("prevMonth").addEventListener("click", () => {
+        calMonth--;
+        if(calMonth < 0){ calMonth = 11; calYear--; }
+        renderCalendar();
+      });
+      $("nextMonth").addEventListener("click", () => {
+        calMonth++;
+        if(calMonth > 11){ calMonth = 0; calYear++; }
+        renderCalendar();
+      });
+      $("clearBusy").addEventListener("click", () => {
+        state.busy = [];
+        save();
+        renderCalendar();
+        toast("Busy dates cleared");
+      });
+      $("exportBusy").addEventListener("click", openExport);
+      renderCalendar();
+    }
+
+    function renderCalendar(){
+      const grid = $("calGrid");
+      grid.innerHTML = "";
+
+      // DOW row
+      days.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "dow";
+        el.textContent = d;
+        grid.appendChild(el);
+      });
+
+      const first = new Date(calYear, calMonth, 1);
+      const last = new Date(calYear, calMonth + 1, 0);
+      const startDow = first.getDay();
+      const totalDays = last.getDate();
+
+      const monthName = first.toLocaleString(undefined, {month:"long", year:"numeric"});
+      $("monthLabel").textContent = monthName;
+
+      // Empty cells before day 1
+      for(let i=0;i<startDow;i++){
+        const cell = document.createElement("div");
+        cell.className = "day empty";
+        grid.appendChild(cell);
+      }
+
+      // Day cells
+      for(let day=1; day<=totalDays; day++){
+        const date = new Date(calYear, calMonth, day);
+        const key = ymd(date);
+        const cell = document.createElement("div");
+        cell.className = "day" + (state.busy.includes(key) ? " busy" : "");
+        cell.textContent = day;
+
+        cell.addEventListener("click", () => {
+          const idx = state.busy.indexOf(key);
+          if(idx >= 0) state.busy.splice(idx, 1);
+          else state.busy.push(key);
+          save();
+          renderCalendar();
+        });
+
+        grid.appendChild(cell);
+      }
+
+      $("busyCount").textContent = state.busy.length;
+    }
+
+    function openExport(){
+      const dlg = $("exportModal");
+      const list = state.busy.slice().sort();
+      $("busyExportText").value = list.length ? list.join("\n") : "(No busy dates marked yet)";
+      dlg.showModal();
+    }
+
+    // Settings modal
+    function initSettings(){
+      const dlg = $("settingsModal");
+      $("openSettings").addEventListener("click", () => {
+        $("youInput").value = state.you;
+        $("partnerInput").value = state.partner;
+        $("budgetInput").value = state.budget;
+        $("notesInput").value = state.notes || "";
+        dlg.showModal();
+      });
+      $("closeSettings").addEventListener("click", () => dlg.close());
+      $("saveSettings").addEventListener("click", () => {
+        state.you = $("youInput").value.trim() || "You";
+        state.partner = $("partnerInput").value.trim() || "Partner";
+        state.budget = Number($("budgetInput").value) || 0;
+        state.notes = $("notesInput").value || "";
+        save();
+        renderAll();
+        dlg.close();
+        toast("Saved");
+      });
+      $("resetAll").addEventListener("click", () => {
+        state.tripId = TRIPS[0].id;
+        state.you = "Mohit";
+        state.partner = "Ayushi";
+        state.budget = 300000;
+        state.notes = "";
+        state.busy = [];
+        state.bucketDone = {};
+        save();
+        renderAll();
+        dlg.close();
+        toast("Reset done");
+      });
+
+      // Export modal buttons
+      $("closeExport").addEventListener("click", () => $("exportModal").close());
+      $("copyBusy").addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText($("busyExportText").value);
+          toast("Busy dates copied");
+        }catch(e){
+          toast("Copy failed");
+        }
+      });
+    }
+
+    // Copy summary
+    function planSummary(){
+      const trip = getTrip();
+      const total = trip.pricePerPersonINR * 2;
+      const busy = state.busy.slice().sort().join(", ") || "none";
+      const done = bucketDoneMap();
+      const totalItems = trip.bucketList.length;
+      let completed = 0;
+      for(let i=0;i<totalItems;i++) if(done[i]) completed++;
+      const pct = totalItems ? Math.round((completed/totalItems)*100) : 0;
+
+      return [
+        `Couple: ${state.you} & ${state.partner}`,
+        `Trip: ${trip.name}`,
+        `Best time: ${trip.bestTime}`,
+        `Duration: ${trip.durationDays} days`,
+        `Price (2 pax): ${formatINR(total)} (budget: ${formatINR(Number(state.budget)||0)})`,
+        `Bucket progress: ${completed}/${totalItems} (${pct}%)`,
+        `Busy days: ${busy}`,
+        state.notes ? `Notes: ${state.notes}` : ""
+      ].filter(Boolean).join("\n");
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        toast("Copied");
+      }catch(e){
+        toast("Copy failed");
+      }
+    }
+
+    function initCopyButtons(){
+      $("copySummary").addEventListener("click", () => copyText(planSummary()));
+      $("copySummary2").addEventListener("click", () => copyText(planSummary()));
+    }
+
+    function renderAll(){
+      renderTripSelect();
+      renderTripDetails();
+      renderCalendar();
+      updateHeader();
+    }
+
+    // Boot
+    load();
+    renderTripSelect();
+    initTabs();
+    initCalendar();
+    initSettings();
+    initCopyButtons();
+    renderTripDetails();
+  </script>
+</body>
+</html>
